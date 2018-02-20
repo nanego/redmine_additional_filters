@@ -9,5 +9,10 @@ describe IssueQuery do
       expect(query.available_filters).to include 'notes'
     end
 
+    it 'initialize an "all_text_fields" filter' do
+      query = IssueQuery.new
+      expect(query.available_filters).to include 'all_text_fields'
+    end
+
   end
 end
