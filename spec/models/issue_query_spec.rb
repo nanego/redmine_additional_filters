@@ -2,6 +2,9 @@ require 'spec_helper'
 require 'redmine_additional_filters/models/issue_query_patch'
 
 describe IssueQuery do
+
+  fixtures :issues, :journals, :journal_details
+
   describe 'filters and columns' do
 
     def find_issues_with_query(query)
