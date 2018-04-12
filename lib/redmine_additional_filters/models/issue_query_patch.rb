@@ -4,7 +4,7 @@ require_dependency 'issue_query'
 
 module PluginAdditionalFilters
 
-  module IssueQuery
+  module IssueQueryPatch
 
     def initialize_available_filters
       super
@@ -51,4 +51,4 @@ module PluginAdditionalFilters
 
 end
 
-IssueQuery.prepend PluginAdditionalFilters::IssueQuery
+IssueQuery.prepend PluginAdditionalFilters::IssueQueryPatch
