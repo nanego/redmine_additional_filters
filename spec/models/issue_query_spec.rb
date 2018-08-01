@@ -3,7 +3,13 @@ require 'redmine_additional_filters/models/issue_query_patch'
 
 describe IssueQuery do
 
-  fixtures :issues, :journals, :journal_details
+  fixtures :issues, :journals, :journal_details,
+           :projects, :enabled_modules,
+           :users, :email_addresses,
+           :members, :member_roles, :roles,
+           :trackers, :issue_statuses, :issue_categories, :enumerations, :versions,
+           :custom_fields, :custom_values,
+           :queries
 
   describe 'filters and columns' do
 
