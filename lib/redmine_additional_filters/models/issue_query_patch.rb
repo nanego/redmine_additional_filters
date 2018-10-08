@@ -2,6 +2,12 @@
 
 require_dependency 'issue_query'
 
+class IssueQuery < Query
+  project_custom_fields = ProjectCustomField.visible.
+      map {|cf| QueryAssociationCustomFieldColumn.new(:project, cf) }
+  self.available_columns.push(*project_custom_fields)
+end
+
 module PluginAdditionalFilters
 
   module IssueQueryPatch

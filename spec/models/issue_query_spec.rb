@@ -9,7 +9,7 @@ describe IssueQuery do
            :members, :member_roles, :roles,
            :trackers, :issue_statuses, :issue_categories, :enumerations, :versions,
            :custom_fields, :custom_values,
-           :queries
+           :queries, :custom_fields
 
   describe 'filters and columns' do
 
@@ -85,6 +85,12 @@ describe IssueQuery do
       query.add_filter('all_text_fields', '!~', ['unable']) # Text present in the Description
       result = find_issues_with_query(query)
       expect(result).to_not include issue
+    end
+
+    it 'has new columns for project custom fields' do
+      ProjectCustomField.all.each do |project_cf|
+        expect(IssueQuery.available_columns.find { |column| column.name == "project.cf_#{project_cf.id}".to_sym }).to_not be_nil
+      end
     end
 
   end
