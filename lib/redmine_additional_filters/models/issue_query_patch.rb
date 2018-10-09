@@ -7,7 +7,7 @@ class IssueQuery < Query
       map {|cf| QueryAssociationCustomFieldColumn.new(:project, cf) }
   self.available_columns.push(*project_custom_fields)
 
-  self.available_columns << QueryColumn.new(:notes_count, :sortable => false, :groupable => false) if self.available_columns.select { |c| c.name == :notes_count }.empty?
+  self.available_columns << QueryColumn.new(:notes_count, :groupable => false) if self.available_columns.select { |c| c.name == :notes_count }.empty?
 end
 
 module PluginAdditionalFilters
