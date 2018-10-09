@@ -6,6 +6,8 @@ class IssueQuery < Query
   project_custom_fields = ProjectCustomField.visible.
       map {|cf| QueryAssociationCustomFieldColumn.new(:project, cf) }
   self.available_columns.push(*project_custom_fields)
+
+  self.available_columns << QueryColumn.new(:notes_count, :sortable => false, :groupable => false) if self.available_columns.select { |c| c.name == :notes_count }.empty?
 end
 
 module PluginAdditionalFilters
@@ -51,6 +53,16 @@ module PluginAdditionalFilters
         else
           ""
       end
+    end
+
+    # Returns the issues
+    # Valid options are :order, :offset, :limit, :include, :conditions
+    def issues(options={})
+      issues = super
+      if has_column?(:notes_count)
+        Issue.load_notes_count(issues)
+      end
+      issues
     end
 
   end

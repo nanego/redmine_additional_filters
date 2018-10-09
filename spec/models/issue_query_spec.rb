@@ -93,5 +93,16 @@ describe IssueQuery do
       end
     end
 
+    it 'has a new column for issue notes count' do
+        expect(IssueQuery.available_columns.find { |column| column.name == :notes_count }).to_not be_nil
+    end
+
+    it 'should preload notes count' do
+      q = IssueQuery.new(:name => '_', :column_names => [:subject, :notes_count])
+      expect(q.has_column?(:notes_count))
+      issues = q.issues
+      expect(issues.first.instance_variable_get("@notes_count")).to_not be_nil
+    end
+
   end
 end
