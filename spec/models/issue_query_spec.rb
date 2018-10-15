@@ -9,7 +9,7 @@ describe IssueQuery do
            :members, :member_roles, :roles,
            :trackers, :issue_statuses, :issue_categories, :enumerations, :versions,
            :custom_fields, :custom_values,
-           :queries, :custom_fields
+           :queries
 
   describe 'filters and columns' do
 
