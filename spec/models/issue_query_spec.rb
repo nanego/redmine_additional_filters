@@ -19,7 +19,7 @@ describe IssueQuery do
       ).to_a
     end
 
-    it 'initialize an "notes" filter' do
+    it 'initialize a "notes" filter' do
       query = IssueQuery.new
       expect(query.available_filters).to include 'notes'
     end
@@ -93,15 +93,104 @@ describe IssueQuery do
       end
     end
 
-    it 'has a new column for issue notes count' do
-        expect(IssueQuery.available_columns.find { |column| column.name == :notes_count }).to_not be_nil
-    end
+    describe 'notes count filter and column' do
 
-    it 'should preload notes count' do
-      q = IssueQuery.new(:name => '_', :column_names => [:subject, :notes_count])
-      expect(q.has_column?(:notes_count))
-      issues = q.issues
-      expect(issues.first.instance_variable_get("@notes_count")).to_not be_nil
+      before do
+        @issue_one = Issue.find(1)
+        expect(@issue_one.notes_count).to eq 2
+        @issue_two = Issue.find(2)
+        expect(@issue_two.notes_count).to eq 1
+        @issue_three = Issue.find(3)
+        expect(@issue_three.notes_count).to eq 0
+      end
+
+      it 'initialize an "notes count" filter' do
+        query = IssueQuery.new(:name => '_')
+        expect(query.available_filters).to include 'notes_count'
+      end
+
+      it 'filters issues by notes count with operator =' do
+        query = IssueQuery.new(:name => '_')
+        query.add_filter('notes_count', '=', ['1'])
+        result = find_issues_with_query(query)
+        expect(result).to include @issue_two
+        expect(result).to_not include @issue_one
+      end
+
+      it 'filters issues by notes count with operator = and value is zero' do
+        query = IssueQuery.new(:name => '_')
+        query.add_filter('notes_count', '=', ['0'])
+        result = find_issues_with_query(query)
+        expect(result).to include @issue_three
+        expect(result).to_not include @issue_one
+      end
+
+      it 'filters issues by notes count with operators >= & <=' do
+        query = IssueQuery.new(:name => '_')
+        query.add_filter('notes_count', '>=', ['1'])
+        result = find_issues_with_query(query)
+        expect(result).to include @issue_two
+        expect(result).to include @issue_one
+        expect(result).to_not include @issue_three
+
+        query = IssueQuery.new(:name => '_')
+        query.add_filter('notes_count', '<=', ['1'])
+        result = find_issues_with_query(query)
+        expect(result).to include @issue_three
+        expect(result).to include @issue_two
+        expect(result).to_not include @issue_one
+
+        query = IssueQuery.new(:name => '_')
+        query.add_filter('notes_count', '>=', ['10'])
+        result = find_issues_with_query(query)
+        expect(result).to_not include @issue_two
+        expect(result).to_not include @issue_one
+        expect(result).to_not include @issue_three
+      end
+
+      it 'filters issues by notes count with operators * & !*' do
+        query = IssueQuery.new(:name => '_')
+        query.add_filter('notes_count', '*')
+        result = find_issues_with_query(query)
+        expect(result).to include @issue_two
+        expect(result).to include @issue_one
+        expect(result).to_not include @issue_three
+
+        query = IssueQuery.new(:name => '_')
+        query.add_filter('notes_count', '!*')
+        result = find_issues_with_query(query)
+        expect(result).to include @issue_three
+        expect(result).to_not include @issue_two
+        expect(result).to_not include @issue_one
+      end
+
+      it 'filters issues by notes count with operator ><' do
+        query = IssueQuery.new(:name => '_')
+        query.add_filter('notes_count', '><', ['1', '2'])
+        result = find_issues_with_query(query)
+        expect(result).to include @issue_two
+        expect(result).to include @issue_one
+        expect(result).to_not include @issue_three
+
+        query = IssueQuery.new(:name => '_')
+        query.add_filter('notes_count', '><', ['0', '1'])
+        result = find_issues_with_query(query)
+        expect(result).to include @issue_two
+        expect(result).to_not include @issue_one
+        expect(result).to include @issue_three
+      end
+
+      it 'has a new column for issue notes count' do
+        expect(IssueQuery.available_columns.find { |column| column.name == :notes_count }).to_not be_nil
+      end
+
+      it 'should preload notes count' do
+        q = IssueQuery.new(:name => '_', :column_names => [:subject, :notes_count])
+        expect(q.has_column?(:notes_count))
+        issues = q.issues
+        expect(issues.first.instance_variable_get("@notes_count")).to_not be_nil
+      end
+
     end
 
   end

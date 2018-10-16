@@ -1,12 +1,10 @@
-# frozen_string_literal: true
-
 require_dependency 'issue_query'
 
 class IssueQuery < Query
-  unless Rails.env.test? # These lines break core tests TODO Fix it
+  # unless Rails.env.test? # These lines break core tests TODO Fix it
     project_custom_fields = ProjectCustomField.visible.map {|cf| QueryAssociationCustomFieldColumn.new(:project, cf)}
     self.available_columns.push(*project_custom_fields)
-  end
+  # end
 
   self.available_columns << QueryColumn.new(:notes_count, :groupable => false) if self.available_columns.select {|c| c.name == :notes_count}.empty?
 end
@@ -20,6 +18,7 @@ module PluginAdditionalFilters
       # self.operators_by_filter_type.merge!({ :text_contains => ["~", "!~"] })
       add_available_filter "notes", type: :text
       add_available_filter "all_text_fields", type: :text
+      add_available_filter "notes_count", :type => :integer
     end
 
     def sql_for_notes_field(field, operator, value)
@@ -54,6 +53,62 @@ module PluginAdditionalFilters
       else
         ""
       end
+    end
+
+    def sql_for_notes_count_field(field, operator, value)
+      subquery = "SELECT t.journalized_id FROM (SELECT journals.journalized_id, count(journals.id) as counter
+          FROM journals
+          INNER JOIN issues ON issues.id = journals.journalized_id
+          INNER JOIN projects ON projects.id = issues.project_id
+          WHERE journals.journalized_type = 'Issue'
+          AND ((journals.private_notes = 'f' OR journals.user_id = #{User.current.id} OR ((projects.status <> 9 OR 1=0))))
+          AND (journals.notes != '')
+          GROUP BY journals.journalized_id"
+
+      if value.any?
+        int_values = value.first.to_s.scan(/[+-]?\d+/).map(&:to_i)
+      else
+        # IN an empty set
+        return "1=0"
+      end
+
+      case operator
+      when "="
+        sql = "issues.id IN ( #{subquery} ) t
+          WHERE t.counter IN (#{int_values.join(',')})
+          )"
+        if int_values.include?(0)
+          sql << " OR issues.id NOT IN ( #{subquery} ) t )"
+        end
+      when "!*", "*"
+        neg = (operator == '!*' ? 'NOT' : '')
+        sql = "issues.id #{neg} IN ( #{subquery} ) t )"
+      when ">="
+        sql = "issues.id IN ( #{subquery} ) t
+          WHERE t.counter >= #{int_values.first}
+          )"
+        if int_values.first == 0
+          sql << " OR issues.id NOT IN ( #{subquery} ) t )"
+        end
+      when "<="
+        sql = "issues.id IN ( #{subquery} ) t
+          WHERE t.counter #{operator} (#{int_values.first})
+          )"
+        if int_values.first >= 0
+          sql << " OR issues.id NOT IN ( #{subquery} ) t )"
+        end
+      when "><"
+        sql = "issues.id IN ( #{subquery} ) t
+          WHERE t.counter BETWEEN #{value[0].to_i} AND #{value[1].to_i}
+          )"
+        if value[0].to_i == 0 || value[1].to_i == 0
+          sql << " OR issues.id NOT IN ( #{subquery} ) t )"
+        end
+      else
+        raise "Unknown query operator #{operator}"
+      end
+
+      return sql
     end
 
     # Returns the issues
