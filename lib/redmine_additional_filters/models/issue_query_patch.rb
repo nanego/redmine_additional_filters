@@ -2,11 +2,20 @@ require_dependency 'issue_query'
 
 class IssueQuery < Query
   # unless Rails.env.test? # These lines break core tests TODO Fix it
-    project_custom_fields = ProjectCustomField.visible.map {|cf| QueryAssociationCustomFieldColumn.new(:project, cf)}
-    self.available_columns.push(*project_custom_fields)
+  project_custom_fields = ProjectCustomField.visible.map {|cf| QueryAssociationCustomFieldColumn.new(:project, cf)}
+  self.available_columns.push(*project_custom_fields)
   # end
 
-  self.available_columns << QueryColumn.new(:notes_count, :groupable => false) if self.available_columns.select {|c| c.name == :notes_count}.empty?
+  # Left join allows us to include issues which do not have any journal
+  sql_to_sort_issues_by_notes_count = "(SELECT COALESCE(t.counter,0) as counter FROM issues as i
+	  left join (SELECT journals.journalized_id, count(journals.id) as counter
+    FROM journals
+    WHERE journals.journalized_type = 'Issue'
+    AND (journals.notes != '')
+    GROUP BY journals.journalized_id) t on t.journalized_id = i.id
+	  WHERE i.id = issues.id)"
+  self.available_columns << QueryColumn.new(:notes_count, :groupable => false, :sortable => sql_to_sort_issues_by_notes_count) if self.available_columns.select {|c| c.name == :notes_count}.empty?
+
 end
 
 module PluginAdditionalFilters

@@ -15,7 +15,7 @@ describe IssueQuery do
 
     def find_issues_with_query(query)
       Issue.joins(:status, :tracker, :project, :priority).where(
-        query.statement
+          query.statement
       ).to_a
     end
 
@@ -89,7 +89,7 @@ describe IssueQuery do
 
     it 'has new columns for project custom fields' do
       ProjectCustomField.all.each do |project_cf|
-        expect(IssueQuery.available_columns.find { |column| column.name == "project.cf_#{project_cf.id}".to_sym }).to_not be_nil
+        expect(IssueQuery.available_columns.find {|column| column.name == "project.cf_#{project_cf.id}".to_sym}).to_not be_nil
       end
     end
 
@@ -181,7 +181,7 @@ describe IssueQuery do
       end
 
       it 'has a new column for issue notes count' do
-        expect(IssueQuery.available_columns.find { |column| column.name == :notes_count }).to_not be_nil
+        expect(IssueQuery.available_columns.find {|column| column.name == :notes_count}).to_not be_nil
       end
 
       it 'should preload notes count' do
@@ -189,6 +189,28 @@ describe IssueQuery do
         expect(q.has_column?(:notes_count))
         issues = q.issues
         expect(issues.first.instance_variable_get("@notes_count")).to_not be_nil
+      end
+
+      it 'should be able to sort by notes count ASC' do
+        query = IssueQuery.new(:name => 'Sorted')
+        column = query.available_columns.find {|col| col.name == :notes_count}
+        expect(column).to_not be_nil
+        expect(column.sortable).to_not be_nil
+        issues = query.issues(:order => "#{column.sortable} ASC")
+        values = issues.map(&:notes_count)
+        expect(values).to_not be_empty
+        expect(values).to eq values.sort
+      end
+
+      it 'should be able to sort by notes count DESC' do
+        query = IssueQuery.new(:name => 'Sorted')
+        column = query.available_columns.find {|col| col.name == :notes_count}
+        expect(column).to_not be_nil
+        expect(column.sortable).to_not be_nil
+        issues = query.issues(:order => "#{column.sortable} DESC")
+        values = issues.map(&:notes_count)
+        expect(values).to_not be_empty
+        expect(values).to eq values.sort.reverse
       end
 
     end
