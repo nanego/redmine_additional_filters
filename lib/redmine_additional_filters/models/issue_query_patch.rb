@@ -28,6 +28,9 @@ module PluginAdditionalFilters
       add_available_filter "notes", type: :text
       add_available_filter "all_text_fields", type: :text
       add_available_filter "notes_count", :type => :integer
+      add_available_filter "subproject_id",
+                           :type => :list,
+                           :values => lambda { project_values }
     end
 
     def sql_for_notes_field(field, operator, value)
