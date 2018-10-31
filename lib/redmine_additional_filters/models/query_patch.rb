@@ -23,6 +23,14 @@ class Query < ActiveRecord::Base
           end
           project_clauses = selected_projects_clauses.join(' AND ') if selected_projects_clauses.any?
         end
+      else
+        if project
+          if Setting.display_subprojects_issues?
+            project_clauses = "#{Project.table_name}.lft >= #{project.lft} AND #{Project.table_name}.rgt <= #{project.rgt}"
+          else
+            project_clauses = "#{Project.table_name}.id = %d" % project.id
+          end
+        end
       end
     end
     project_clauses
