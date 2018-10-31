@@ -30,7 +30,8 @@ module PluginAdditionalFilters
       add_available_filter "notes_count", :type => :integer
       add_available_filter "subproject_id",
                            :type => :list,
-                           :values => lambda { project_values }
+                           :values => lambda {project_values},
+                           :label => :field_parent
     end
 
     def sql_for_notes_field(field, operator, value)
