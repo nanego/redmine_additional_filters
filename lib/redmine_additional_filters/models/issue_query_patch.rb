@@ -1,9 +1,12 @@
 require_dependency 'issue_query'
+require_dependency 'custom_field'
+require_dependency 'project_custom_field'
 
-class IssueQuery < Query
+class IssueQuery
+
   # unless Rails.env.test? # These lines break core tests TODO Fix it
-  project_custom_fields = ProjectCustomField.visible.map {|cf| QueryAssociationCustomFieldColumn.new(:project, cf)}
-  self.available_columns.push(*project_custom_fields)
+    project_custom_fields = ProjectCustomField.visible.map {|cf| QueryAssociationCustomFieldColumn.new(:project, cf)}
+    self.available_columns.push(*project_custom_fields)
   # end
 
   # Left join allows us to include issues which do not have any journal
