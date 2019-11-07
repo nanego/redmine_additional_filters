@@ -32,7 +32,7 @@ class Issue < ActiveRecord::Base
   end
 
   def first_assignment_date
-    first_assignment_date = journals.joins(:details).where("journal_details.property = ? AND journal_details.prop_key = ? AND old_value IS NULL", 'attr', 'assigned_to_id').order('created_on asc').limit(1).pluck('created_on')
+    first_assignment_date = journals.joins(:details).where("journal_details.property = ? AND journal_details.prop_key = ? AND old_value IS NULL", 'attr', 'assigned_to_id').order('created_on asc').limit(1).pluck('created_on').first
     first_assignment_date = created_on if first_assignment_date.blank? && assigned_to.present?
     first_assignment_date
   end
