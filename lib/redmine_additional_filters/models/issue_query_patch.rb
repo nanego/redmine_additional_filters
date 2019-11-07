@@ -18,6 +18,7 @@ class IssueQuery
     GROUP BY journals.journalized_id) t on t.journalized_id = i.id
 	  WHERE i.id = issues.id)"
   self.available_columns << QueryColumn.new(:notes_count, :groupable => false, :sortable => sql_to_sort_issues_by_notes_count) if self.available_columns.select {|c| c.name == :notes_count}.empty?
+  self.available_columns << QueryColumn.new(:first_assignment_date) if self.available_columns.select {|c| c.name == :first_assignment_date}.empty?
 
 end
 

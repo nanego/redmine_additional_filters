@@ -215,5 +215,17 @@ describe IssueQuery do
 
     end
 
+    describe 'first_assignment_date column' do
+
+      before do
+
+      end
+
+      it 'has a new column for first_assignment_date' do
+        expect(IssueQuery.available_columns.find {|column| column.name == :first_assignment_date}).to_not be_nil
+      end
+
+    end
+
   end
 end

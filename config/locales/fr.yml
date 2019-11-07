@@ -1,3 +1,4 @@
 fr:
   field_all_text_fields: Sujet, Description et Notes
   field_notes_count: Nombre de réponses
+  field_first_assignment_date: Date de 1ère assignation
