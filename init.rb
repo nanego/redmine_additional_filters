@@ -5,6 +5,7 @@ ActiveSupport::Reloader.to_prepare do
   require_dependency 'redmine_additional_filters/models/issue_patch'
   require_dependency 'redmine_additional_filters/models/query_patch' unless Rails.env.test?
   require_dependency 'redmine_additional_filters/models/issue_query_patch'
+  require_dependency 'redmine_additional_filters/models/issue_status_patch'
   # require_dependency 'redmine_additional_filters/helpers/queries_helper_patch'
 end
 

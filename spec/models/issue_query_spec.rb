@@ -227,5 +227,17 @@ describe IssueQuery do
 
     end
 
+    describe 'resolved_on column' do
+
+      before do
+
+      end
+
+      it 'has a new column for last resolved date' do
+        expect(IssueQuery.available_columns.find {|column| column.name == :resolved_on}).to_not be_nil
+      end
+
+    end
+
   end
 end

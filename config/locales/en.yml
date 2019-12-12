@@ -1,3 +1,6 @@
 en:
   field_all_text_fields: Subject, Description and Notes
   field_notes_count: Number of replies
+  field_first_assignment_date: First assignment date
+  field_resolved_on: Resolved date
+  field_is_resolved: Resolved issue
