@@ -3,12 +3,6 @@ require_dependency 'custom_field'
 require_dependency 'project_custom_field'
 
 class IssueQuery
-
-  # unless Rails.env.test? # These lines break core tests TODO Fix it
-    project_custom_fields = ProjectCustomField.visible.map {|cf| QueryAssociationCustomFieldColumn.new(:project, cf)}
-    self.available_columns.push(*project_custom_fields)
-  # end
-
   # Left join allows us to include issues which do not have any journal
   sql_to_sort_issues_by_notes_count = "(SELECT COALESCE(t.counter,0) as counter FROM issues as i
 	  left join (SELECT journals.journalized_id, count(journals.id) as counter
@@ -21,6 +15,13 @@ class IssueQuery
 
   self.available_columns << QueryColumn.new(:first_assignment_date) if self.available_columns.select {|c| c.name == :first_assignment_date}.empty?
   self.available_columns << QueryColumn.new(:resolved_on) if self.available_columns.select {|c| c.name == :resolved_on}.empty?
+
+  def self.add_project_custom_fields_to_available_columns
+    project_custom_fields = ProjectCustomField.all.map {|cf| QueryAssociationCustomFieldColumn.new(:project, cf)}
+    self.available_columns.push(*project_custom_fields)
+  end
+
+  self.add_project_custom_fields_to_available_columns
 
 end
 
