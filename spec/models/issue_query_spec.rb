@@ -88,7 +88,7 @@ describe IssueQuery do
 
     it 'has new columns for project custom fields' do
       IssueQuery.add_project_custom_fields_to_available_columns
-      ProjectCustomField.all.each do |project_cf|
+      ProjectCustomField.find_each do |project_cf|
         expect(IssueQuery.available_columns.find {|column| column.name == "project.cf_#{project_cf.id}".to_sym}).to_not be_nil
       end
     end
