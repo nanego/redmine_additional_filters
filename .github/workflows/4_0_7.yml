@@ -3,6 +3,7 @@ name: Tests 4.0.7
 env:
   PLUGIN_NAME: redmine_additional_filters
   REDMINE_VERSION: 4.0.7
+  RAILS_ENV: test
 
 on:
   push:
@@ -128,6 +129,8 @@ jobs:
           path: redmine/plugins/${{ env.PLUGIN_NAME }}
 
       - name: Install plugins dependencies and run plugins migrations
+        env:
+          RAILS_ENV: test
         working-directory: redmine
         run: |
           bundle install --jobs=4 --retry=3 --without development
