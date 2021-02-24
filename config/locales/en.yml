@@ -4,3 +4,4 @@ en:
   field_first_assignment_date: First assignment date
   field_resolved_on: Resolved date
   field_is_resolved: Resolved issue
+  field_author_mail: Author mail address

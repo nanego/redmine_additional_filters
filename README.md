@@ -1,13 +1,19 @@
 Redmine Additional Filters plugin
 ======================
 
-This Redmine plugin adds some useful filters.
+This Redmine plugin adds some useful filters and columns.
 
 Search issues by:
 - Notes
 - All text fields (Subject, Description and Notes)
 - Number of notes
 - ...
+
+Display new columns as:
+- First assignment date
+- Resolved date  
+- Author mail address
+
 
 ## Requirements
 

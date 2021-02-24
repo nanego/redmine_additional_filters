@@ -61,4 +61,8 @@ class Issue < ActiveRecord::Base
     end
   end
 
+  def author_mail
+    author.mail
+  end
+
 end

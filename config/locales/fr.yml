@@ -4,3 +4,4 @@ fr:
   field_first_assignment_date: Date de 1ère assignation
   field_resolved_on: Traitée le
   field_is_resolved: Demande traitée
+  field_author_mail: Email de l'auteur

@@ -239,5 +239,13 @@ describe IssueQuery do
 
     end
 
+    describe 'author_email column' do
+
+      it 'adds a new column to display the author mail address' do
+        expect(IssueQuery.available_columns.find {|column| column.name == :author_mail}).to_not be_nil
+      end
+
+    end
+
   end
 end
