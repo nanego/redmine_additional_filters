@@ -33,7 +33,7 @@ class Query < ActiveRecord::Base
         end
       end
     end
-    project_clauses
+    "(#{project_clauses})"
   end
 
 end
