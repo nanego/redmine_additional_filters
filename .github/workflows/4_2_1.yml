@@ -1,9 +1,8 @@
-name: Tests 4.0.8
+name: Tests 4.2.1
 
 env:
   PLUGIN_NAME: redmine_additional_filters
-  REDMINE_VERSION: 4.0.8
-  RAILS_ENV: test
+  REDMINE_VERSION: 4.2.1
 
 on:
   push:
