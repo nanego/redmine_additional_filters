@@ -65,4 +65,9 @@ class Issue < ActiveRecord::Base
     author.mail
   end
 
+  # Return true if the issue is resolved, otherwise false
+  def resolved?
+    status.present? && status.is_resolved?
+  end
+
 end
