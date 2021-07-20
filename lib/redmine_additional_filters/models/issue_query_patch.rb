@@ -24,8 +24,6 @@ class IssueQuery
     self.available_columns.push(*project_custom_fields)
   end
 
-  self.add_project_custom_fields_to_available_columns
-
 end
 
 module PluginAdditionalFilters
