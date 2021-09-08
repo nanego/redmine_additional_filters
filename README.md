@@ -24,8 +24,8 @@ Display new columns as:
 
 |Plugin branch| Redmine Version   | Test Status      |
 |-------------|-------------------|------------------|
-|master       | 4.2.2             | [![4.2.1][1]][5] |
-|master       | 4.1.4             | [![4.1.3][2]][5] |
+|master       | 4.2.2             | [![4.2.2][1]][5] |
+|master       | 4.1.4             | [![4.1.4][2]][5] |
 |master       | master            | [![master][4]][5]|
 
 [1]: https://github.com/nanego/redmine_additional_filters/actions/workflows/4_2_2.yml/badge.svg
