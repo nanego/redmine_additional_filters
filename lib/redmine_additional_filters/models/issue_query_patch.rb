@@ -17,7 +17,7 @@ class IssueQuery
   self.available_columns << QueryColumn.new(:resolved_on) if self.available_columns.select {|c| c.name == :resolved_on}.empty?
 
   sql_to_sort_issues_by_author_mail = '(SELECT LOWER("email_addresses".address) as author_mail FROM "email_addresses" WHERE "email_addresses"."user_id" = "issues".author_id AND "email_addresses"."is_default" = true LIMIT 1)'
-  self.available_columns << QueryColumn.new(:author_mail, sortable: sql_to_sort_issues_by_author_mail, groupable: sql_to_sort_issues_by_author_mail) if self.available_columns.select {|c| c.name == :author_mail}.empty?
+  self.available_columns << QueryColumn.new(:author_mail, sortable: sql_to_sort_issues_by_author_mail, groupable: false) if self.available_columns.select {|c| c.name == :author_mail}.empty?
 
   def self.add_project_custom_fields_to_available_columns
     project_custom_fields = ProjectCustomField.all.map {|cf| QueryAssociationCustomFieldColumn.new(:project, cf)}

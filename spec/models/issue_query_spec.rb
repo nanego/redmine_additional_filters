@@ -245,6 +245,14 @@ describe IssueQuery do
         expect(IssueQuery.available_columns.find {|column| column.name == :author_mail}).to_not be_nil
       end
 
+      it "displays the author_email column" do
+        q = IssueQuery.new(:name => '_', :column_names => [:subject, :author_email], :group_by => 'author_email')
+        expect(q.has_column?(:author_email))
+        issues = q.issues
+        puts "issues: #{issues.inspect}"
+        expect(issues).to_not be_empty
+      end
+
     end
 
   end
