@@ -32,12 +32,35 @@ module PluginAdditionalFilters
 
     def initialize_available_filters
       super
+      add_available_filter "notes", type: :text if Redmine::VERSION::MAJOR < 5
       add_available_filter "all_text_fields", type: :text
       add_available_filter "notes_count", :type => :integer
       add_available_filter "subproject_id",
                            :type => :list,
                            :values => lambda {project_values},
                            :label => :field_parent
+    end
+
+    if Redmine::VERSION::MAJOR < 5
+      def sql_for_notes_field(field, operator, value)
+        case operator
+        when "~", "!~" # Contain / Do not contain
+          boolean_switch = operator == "!~" ? 'NOT' : ''
+          journals = Journal.arel_table
+          "(#{boolean_switch} EXISTS (SELECT DISTINCT #{Journal.table_name}.journalized_id FROM #{Journal.table_name}" +
+            " WHERE #{Issue.table_name}.id = #{Journal.table_name}.journalized_id AND" +
+            " #{Journal.table_name}.journalized_type = 'Issue' AND" +
+            " #{journals[:notes].matches("%#{value.first}%").to_sql} ))"
+        when "*", "!*" # All / None
+          boolean_switch = operator == "!*" ? 'NOT' : ''
+          "(#{boolean_switch} EXISTS (SELECT DISTINCT #{Journal.table_name}.journalized_id FROM #{Journal.table_name}" +
+            " WHERE #{Issue.table_name}.id = #{Journal.table_name}.journalized_id AND" +
+            " #{Journal.table_name}.journalized_type = 'Issue' AND" +
+            " (#{Journal.table_name}.notes IS NOT NULL AND #{Journal.table_name}.notes <> '')))"
+        else
+          ""
+        end
+      end
     end
 
     def sql_for_all_text_fields_field(field, operator, value)
