@@ -7,17 +7,17 @@ class Issue < ActiveRecord::Base
     if issues.any?
       issue_ids = issues.map(&:id)
       notes_count_per_issue = Journal.joins(issue: :project).select('journalized_id, count(journals.id) as count').
-          where(:journalized_type => 'Issue', :journalized_id => issue_ids).
-          where(Journal.visible_notes_condition(user, :skip_pre_condition => true)).
-          where.not(notes: '').
-          group(:journalized_id).map do |journal|
+        where(:journalized_type => 'Issue', :journalized_id => issue_ids).
+        where(Journal.visible_notes_condition(user, :skip_pre_condition => true)).
+        where.not(notes: '').
+        group(:journalized_id).map do |journal|
         {
-            journalized_id: journal.journalized_id,
-            count: journal.count
+          journalized_id: journal.journalized_id,
+          count: journal.count
         }
       end
       issues.each do |issue|
-        count = notes_count_per_issue.detect {|j| j[:journalized_id] == issue.id}
+        count = notes_count_per_issue.detect { |j| j[:journalized_id] == issue.id }
         issue.instance_variable_set("@notes_count", count ? count[:count] : 0)
       end
     end
@@ -38,19 +38,19 @@ class Issue < ActiveRecord::Base
   end
 
   def resolved_on
-    resolved_status_ids = IssueStatus.resolved.map {|status| status.id}
+    resolved_status_ids = IssueStatus.resolved.map { |status| status.id }
     if resolved_status_ids.include?(self.status_id)
       resolved_on = journals.
-          joins(:details).
-          where("journal_details.property = ? AND journal_details.prop_key = ? AND value IN (?)",
-                'attr',
-                'status_id',
-                resolved_status_ids.map(&:to_s)
-          ).
-          order('created_on desc').
-          limit(1)
-          .pluck('created_on')
-          .first
+        joins(:details).
+        where("journal_details.property = ? AND journal_details.prop_key = ? AND value IN (?)",
+              'attr',
+              'status_id',
+              resolved_status_ids.map(&:to_s)
+        ).
+        order('created_on desc').
+        limit(1)
+                            .pluck('created_on')
+                            .first
       if resolved_on.present?
         resolved_on
       else

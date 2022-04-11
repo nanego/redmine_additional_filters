@@ -4,13 +4,13 @@ require_dependency 'project_custom_field'
 
 class IssueQuery
   # Left join allows us to include issues which do not have any journal
-  sql_to_sort_issues_by_notes_count = "(SELECT COALESCE(t.counter,0) as counter FROM issues as i
+  sql_to_sort_issues_by_notes_count = Arel.sql("(SELECT COALESCE(t.counter,0) as counter FROM issues as i
 	  left join (SELECT journals.journalized_id, count(journals.id) as counter
     FROM journals
     WHERE journals.journalized_type = 'Issue'
     AND (journals.notes != '')
     GROUP BY journals.journalized_id) t on t.journalized_id = i.id
-	  WHERE i.id = issues.id)"
+	  WHERE i.id = issues.id)")
   self.available_columns << QueryColumn.new(:notes_count, :groupable => false, :sortable => sql_to_sort_issues_by_notes_count) if self.available_columns.select {|c| c.name == :notes_count}.empty?
 
   self.available_columns << QueryColumn.new(:first_assignment_date) if self.available_columns.select {|c| c.name == :first_assignment_date}.empty?
@@ -32,34 +32,12 @@ module PluginAdditionalFilters
 
     def initialize_available_filters
       super
-      # self.operators_by_filter_type.merge!({ :text_contains => ["~", "!~"] })
-      add_available_filter "notes", type: :text
       add_available_filter "all_text_fields", type: :text
       add_available_filter "notes_count", :type => :integer
       add_available_filter "subproject_id",
                            :type => :list,
                            :values => lambda {project_values},
                            :label => :field_parent
-    end
-
-    def sql_for_notes_field(field, operator, value)
-      case operator
-      when "~", "!~" # Contain / Do not contain
-        boolean_switch = operator == "!~" ? 'NOT' : ''
-        journals = Journal.arel_table
-        "(#{boolean_switch} EXISTS (SELECT DISTINCT #{Journal.table_name}.journalized_id FROM #{Journal.table_name}" +
-            " WHERE #{Issue.table_name}.id = #{Journal.table_name}.journalized_id AND" +
-            " #{Journal.table_name}.journalized_type = 'Issue' AND" +
-            " #{journals[:notes].matches("%#{value.first}%").to_sql} ))"
-      when "*", "!*" # All / None
-        boolean_switch = operator == "!*" ? 'NOT' : ''
-        "(#{boolean_switch} EXISTS (SELECT DISTINCT #{Journal.table_name}.journalized_id FROM #{Journal.table_name}" +
-            " WHERE #{Issue.table_name}.id = #{Journal.table_name}.journalized_id AND" +
-            " #{Journal.table_name}.journalized_type = 'Issue' AND" +
-            " (#{Journal.table_name}.notes IS NOT NULL AND #{Journal.table_name}.notes <> '')))"
-      else
-        ""
-      end
     end
 
     def sql_for_all_text_fields_field(field, operator, value)

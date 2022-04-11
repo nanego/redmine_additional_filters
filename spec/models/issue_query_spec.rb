@@ -196,7 +196,7 @@ describe IssueQuery do
         column = query.available_columns.find {|col| col.name == :notes_count}
         expect(column).to_not be_nil
         expect(column.sortable).to_not be_nil
-        issues = query.issues(:order => "#{column.sortable} ASC")
+        issues = query.issues(:order => Arel.sql("#{column.sortable} ASC"))
         values = issues.map(&:notes_count)
         expect(values).to_not be_empty
         expect(values).to eq values.sort
@@ -207,7 +207,7 @@ describe IssueQuery do
         column = query.available_columns.find {|col| col.name == :notes_count}
         expect(column).to_not be_nil
         expect(column.sortable).to_not be_nil
-        issues = query.issues(:order => "#{column.sortable} DESC")
+        issues = query.issues(:order => Arel.sql("#{column.sortable} DESC"))
         values = issues.map(&:notes_count)
         expect(values).to_not be_empty
         expect(values).to eq values.sort.reverse
@@ -249,7 +249,6 @@ describe IssueQuery do
         q = IssueQuery.new(:name => '_', :column_names => [:subject, :author_email], :group_by => 'author_email')
         expect(q.has_column?(:author_email))
         issues = q.issues
-        puts "issues: #{issues.inspect}"
         expect(issues).to_not be_empty
       end
 
