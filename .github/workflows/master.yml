@@ -71,9 +71,10 @@ jobs:
           sudo mv policy.xml /etc/ImageMagick-6/policy.xml
 
       - name: Setup Ruby
-        uses: actions/setup-ruby@v1
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
 
       - name: Setup Bundler
         run: gem install bundler -v '~> 1.0'
