@@ -1,6 +1,6 @@
 require_dependency 'query'
 
-class Query < ActiveRecord::Base
+module RedmineAdditionalFilters::Models::QueryPatch
 
   def project_statement
     project_clauses = nil
@@ -34,3 +34,4 @@ class Query < ActiveRecord::Base
   end
 
 end
+Query.send :prepend, RedmineAdditionalFilters::Models::QueryPatch

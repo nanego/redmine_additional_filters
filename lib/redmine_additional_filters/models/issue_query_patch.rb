@@ -26,7 +26,7 @@ class IssueQuery
 
 end
 
-module PluginAdditionalFilters
+module RedmineAdditionalFilters::Models
 
   module IssueQueryPatch
 
@@ -147,4 +147,4 @@ module PluginAdditionalFilters
 
 end
 
-IssueQuery.prepend PluginAdditionalFilters::IssueQueryPatch
+IssueQuery.prepend RedmineAdditionalFilters::Models::IssueQueryPatch

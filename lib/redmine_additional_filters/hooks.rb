@@ -7,7 +7,7 @@ module RedmineAdditionalFilters
         require_relative 'models/issue_patch'
         require_relative 'models/query_patch' unless Rails.env.test?
         require_relative 'models/issue_query_patch'
-        require_relative 'models/issue_status'
+        require_relative 'models/issue_status_patch'
       end
     end
   end
