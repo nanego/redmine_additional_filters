@@ -8,4 +8,4 @@ module RedmineAdditionalFilters::Models::IssueStatusPatch
     end
   end
 end
-Project.send :include, RedmineAdditionalFilters::Models::IssueStatusPatch
+IssueStatus.send :include, RedmineAdditionalFilters::Models::IssueStatusPatch
