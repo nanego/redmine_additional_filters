@@ -11,16 +11,16 @@ class IssueQuery
     AND (journals.notes != '')
     GROUP BY journals.journalized_id) t on t.journalized_id = i.id
 	  WHERE i.id = issues.id)")
-  self.available_columns << QueryColumn.new(:notes_count, :groupable => false, :sortable => sql_to_sort_issues_by_notes_count) if self.available_columns.select {|c| c.name == :notes_count}.empty?
+  self.available_columns << QueryColumn.new(:notes_count, :groupable => false, :sortable => sql_to_sort_issues_by_notes_count) if self.available_columns.select { |c| c.name == :notes_count }.empty?
 
-  self.available_columns << QueryColumn.new(:first_assignment_date) if self.available_columns.select {|c| c.name == :first_assignment_date}.empty?
-  self.available_columns << QueryColumn.new(:resolved_on) if self.available_columns.select {|c| c.name == :resolved_on}.empty?
+  self.available_columns << QueryColumn.new(:first_assignment_date) if self.available_columns.select { |c| c.name == :first_assignment_date }.empty?
+  self.available_columns << QueryColumn.new(:resolved_on) if self.available_columns.select { |c| c.name == :resolved_on }.empty?
 
   sql_to_sort_issues_by_author_mail = '(SELECT LOWER("email_addresses".address) as author_mail FROM "email_addresses" WHERE "email_addresses"."user_id" = "issues".author_id AND "email_addresses"."is_default" = true LIMIT 1)'
-  self.available_columns << QueryColumn.new(:author_mail, sortable: sql_to_sort_issues_by_author_mail, groupable: false) if self.available_columns.select {|c| c.name == :author_mail}.empty?
+  self.available_columns << QueryColumn.new(:author_mail, sortable: sql_to_sort_issues_by_author_mail, groupable: false) if self.available_columns.select { |c| c.name == :author_mail }.empty?
 
   def self.add_project_custom_fields_to_available_columns
-    project_custom_fields = ProjectCustomField.all.map {|cf| QueryAssociationCustomFieldColumn.new(:project, cf)}
+    project_custom_fields = ProjectCustomField.all.map { |cf| QueryAssociationCustomFieldColumn.new(:project, cf) }
     self.available_columns.push(*project_custom_fields)
   end
 
@@ -32,12 +32,15 @@ module RedmineAdditionalFilters::Models
 
     def initialize_available_filters
       super
-      add_available_filter "notes", type: :text if Redmine::VERSION::MAJOR < 5
-      add_available_filter "all_text_fields", type: :text
+      if Redmine::VERSION::MAJOR < 5
+        # Deprecated filters, not useful anymore since they have been added to Redmine 5 core
+        add_available_filter "notes", type: :text
+        add_available_filter "all_text_fields", type: :text
+      end
       add_available_filter "notes_count", :type => :integer
       add_available_filter "subproject_id",
                            :type => :list,
-                           :values => lambda {project_values},
+                           :values => lambda { project_values },
                            :label => :field_parent
     end
 
@@ -68,10 +71,10 @@ module RedmineAdditionalFilters::Models
       when "~", "!~", "*", "!*" # Contain / Do not contain / All / None
         boolean_switch = (operator == "!~" || operator == "!*") ? ' AND ' : ' OR '
         " (" + sql_for_field("description", operator, value, Issue.table_name, "description") +
-            boolean_switch +
-            sql_for_field("subject", operator, value, Issue.table_name, "subject") +
-            boolean_switch +
-            sql_for_notes_field("notes", operator, value) + ") "
+          boolean_switch +
+          sql_for_field("subject", operator, value, Issue.table_name, "subject") +
+          boolean_switch +
+          sql_for_notes_field("notes", operator, value) + ") "
       else
         ""
       end

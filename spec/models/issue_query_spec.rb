@@ -14,82 +14,85 @@ describe IssueQuery do
 
     def find_issues_with_query(query)
       Issue.joins(:status, :tracker, :project, :priority).where(
-          query.statement
+        query.statement
       ).to_a
     end
 
-    it 'initialize a "notes" filter' do
-      query = IssueQuery.new
-      expect(query.available_filters).to include 'notes'
-    end
+    if Redmine::VERSION::MAJOR < 5
 
-    it 'initialize an "all_text_fields" filter' do
-      query = IssueQuery.new
-      expect(query.available_filters).to include 'all_text_fields'
-    end
+      it 'initialize a "notes" filter' do
+        query = IssueQuery.new
+        expect(query.available_filters).to include 'notes'
+      end
 
-    it 'test operator contains on "notes" filter' do
-      issue = Issue.find(1)
+      it 'initialize an "all_text_fields" filter' do
+        query = IssueQuery.new
+        expect(query.available_filters).to include 'all_text_fields'
+      end
 
-      query = IssueQuery.new(:name => '_')
-      query.add_filter('notes', '~', ['Al noteS'])
-      result = find_issues_with_query(query)
-      expect(result).to include issue
-      expect(result.size).to be 1
-    end
+      it 'test operator contains on "notes" filter' do
+        issue = Issue.find(1)
 
-    it 'test operator DO NOT contains on "notes" filter' do
-      issue = Issue.find(1)
+        query = IssueQuery.new(:name => '_')
+        query.add_filter('notes', '~', ['Al noteS'])
+        result = find_issues_with_query(query)
+        expect(result).to include issue
+        expect(result.size).to be 1
+      end
 
-      query = IssueQuery.new(:name => '_')
-      query.add_filter('notes', '!~', ['Al noteS'])
-      result = find_issues_with_query(query)
-      expect(result).to_not include issue
-    end
+      it 'test operator DO NOT contains on "notes" filter' do
+        issue = Issue.find(1)
 
-    it 'test operator contains on "all text fields" filter' do
-      issue = Issue.find(1)
+        query = IssueQuery.new(:name => '_')
+        query.add_filter('notes', '!~', ['Al noteS'])
+        result = find_issues_with_query(query)
+        expect(result).to_not include issue
+      end
 
-      query = IssueQuery.new(:name => '_')
-      query.add_filter('all_text_fields', '~', ['Al noteS']) # Text present in Notes
-      result = find_issues_with_query(query)
-      expect(result).to include issue
-      expect(result.size).to be 1
+      it 'test operator contains on "all text fields" filter' do
+        issue = Issue.find(1)
 
-      query = IssueQuery.new(:name => '_')
-      query.add_filter('all_text_fields', '~', ['print recipes']) # Text present in the Subject
-      result = find_issues_with_query(query)
-      expect(result).to include issue
+        query = IssueQuery.new(:name => '_')
+        query.add_filter('all_text_fields', '~', ['Al noteS']) # Text present in Notes
+        result = find_issues_with_query(query)
+        expect(result).to include issue
+        expect(result.size).to be 1
 
-      query = IssueQuery.new(:name => '_')
-      query.add_filter('all_text_fields', '~', ['unable']) # Text present in the Description
-      result = find_issues_with_query(query)
-      expect(result).to include issue
-    end
+        query = IssueQuery.new(:name => '_')
+        query.add_filter('all_text_fields', '~', ['print recipes']) # Text present in the Subject
+        result = find_issues_with_query(query)
+        expect(result).to include issue
 
-    it 'test operator DO NOT contains on "all text fields" filter' do
-      issue = Issue.find(1)
+        query = IssueQuery.new(:name => '_')
+        query.add_filter('all_text_fields', '~', ['unable']) # Text present in the Description
+        result = find_issues_with_query(query)
+        expect(result).to include issue
+      end
 
-      query = IssueQuery.new(:name => '_')
-      query.add_filter('all_text_fields', '!~', ['Al noteS']) # Text present in Notes
-      result = find_issues_with_query(query)
-      expect(result).to_not include issue
+      it 'test operator DO NOT contains on "all text fields" filter' do
+        issue = Issue.find(1)
 
-      query = IssueQuery.new(:name => '_')
-      query.add_filter('all_text_fields', '!~', ['print recipes']) # Text present in the Subject
-      result = find_issues_with_query(query)
-      expect(result).to_not include issue
+        query = IssueQuery.new(:name => '_')
+        query.add_filter('all_text_fields', '!~', ['Al noteS']) # Text present in Notes
+        result = find_issues_with_query(query)
+        expect(result).to_not include issue
 
-      query = IssueQuery.new(:name => '_')
-      query.add_filter('all_text_fields', '!~', ['unable']) # Text present in the Description
-      result = find_issues_with_query(query)
-      expect(result).to_not include issue
+        query = IssueQuery.new(:name => '_')
+        query.add_filter('all_text_fields', '!~', ['print recipes']) # Text present in the Subject
+        result = find_issues_with_query(query)
+        expect(result).to_not include issue
+
+        query = IssueQuery.new(:name => '_')
+        query.add_filter('all_text_fields', '!~', ['unable']) # Text present in the Description
+        result = find_issues_with_query(query)
+        expect(result).to_not include issue
+      end
     end
 
     it 'has new columns for project custom fields' do
       IssueQuery.add_project_custom_fields_to_available_columns
       ProjectCustomField.find_each do |project_cf|
-        expect(IssueQuery.available_columns.find {|column| column.name == "project.cf_#{project_cf.id}".to_sym}).to_not be_nil
+        expect(IssueQuery.available_columns.find { |column| column.name == "project.cf_#{project_cf.id}".to_sym }).to_not be_nil
       end
     end
 
@@ -181,7 +184,7 @@ describe IssueQuery do
       end
 
       it 'has a new column for issue notes count' do
-        expect(IssueQuery.available_columns.find {|column| column.name == :notes_count}).to_not be_nil
+        expect(IssueQuery.available_columns.find { |column| column.name == :notes_count }).to_not be_nil
       end
 
       it 'should preload notes count' do
@@ -193,7 +196,7 @@ describe IssueQuery do
 
       it 'should be able to sort by notes count ASC' do
         query = IssueQuery.new(:name => 'Sorted')
-        column = query.available_columns.find {|col| col.name == :notes_count}
+        column = query.available_columns.find { |col| col.name == :notes_count }
         expect(column).to_not be_nil
         expect(column.sortable).to_not be_nil
         issues = query.issues(:order => Arel.sql("#{column.sortable} ASC"))
@@ -204,7 +207,7 @@ describe IssueQuery do
 
       it 'should be able to sort by notes count DESC' do
         query = IssueQuery.new(:name => 'Sorted')
-        column = query.available_columns.find {|col| col.name == :notes_count}
+        column = query.available_columns.find { |col| col.name == :notes_count }
         expect(column).to_not be_nil
         expect(column.sortable).to_not be_nil
         issues = query.issues(:order => Arel.sql("#{column.sortable} DESC"))
@@ -222,7 +225,7 @@ describe IssueQuery do
       end
 
       it 'has a new column for first_assignment_date' do
-        expect(IssueQuery.available_columns.find {|column| column.name == :first_assignment_date}).to_not be_nil
+        expect(IssueQuery.available_columns.find { |column| column.name == :first_assignment_date }).to_not be_nil
       end
 
     end
@@ -234,7 +237,7 @@ describe IssueQuery do
       end
 
       it 'has a new column for last resolved date' do
-        expect(IssueQuery.available_columns.find {|column| column.name == :resolved_on}).to_not be_nil
+        expect(IssueQuery.available_columns.find { |column| column.name == :resolved_on }).to_not be_nil
       end
 
     end
@@ -242,7 +245,7 @@ describe IssueQuery do
     describe 'author_email column' do
 
       it 'adds a new column to display the author mail address' do
-        expect(IssueQuery.available_columns.find {|column| column.name == :author_mail}).to_not be_nil
+        expect(IssueQuery.available_columns.find { |column| column.name == :author_mail }).to_not be_nil
       end
 
       it "displays the author_email column" do
