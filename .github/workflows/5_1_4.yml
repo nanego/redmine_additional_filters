@@ -1,8 +1,8 @@
-name: Tests 4.2.11
+name: Tests 5.1.4
 
 env:
   PLUGIN_NAME: redmine_additional_filters
-  REDMINE_VERSION: 4.2.11
+  REDMINE_VERSION: 5.1.4
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        ruby: ['2.7']
+        ruby: ['3.2']
         db: ['postgres']
       fail-fast: false
 
@@ -88,6 +88,7 @@ jobs:
       - name: Prepare Redmine source
         working-directory: redmine
         run: |
+          rm -f test/integration/routing/plugins_test.rb # Fix routing tests # TODO Remove this line when https://www.redmine.org/issues/38707 is fixed
           sed -i '/rubocop/d' Gemfile
           rm -f .rubocop*
           cp plugins/redmine_base_rspec/spec/support/database-${{ matrix.db }}.yml config/database.yml
