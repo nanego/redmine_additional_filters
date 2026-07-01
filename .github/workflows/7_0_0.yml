@@ -1,8 +1,8 @@
-name: Tests 6.0.10
+name: Tests 7.0.0
 
 env:
   PLUGIN_NAME: redmine_additional_filters
-  REDMINE_VERSION: 6.0.10
+  REDMINE_VERSION: 7.0.0
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        ruby: ['3.3']
+        ruby: [ '4.0' ]
         db: ['postgres']
       fail-fast: false
 
