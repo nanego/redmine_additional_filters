@@ -1,8 +1,8 @@
-name: Tests 6.1.5
+name: Tests 6.1.6
 
 env:
   PLUGIN_NAME: redmine_additional_filters
-  REDMINE_VERSION: 6.1.5
+  REDMINE_VERSION: 6.1.6
 
 on:
   push:
